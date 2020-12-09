@@ -4,16 +4,79 @@ import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 import java.util.*;
 import javax.swing.*;
+import Connection.Conexao;
+import DAOeBean.*;
+import java.awt.Color;
 
 public class JFClientes extends javax.swing.JFrame {
-
-    /**
-     * Creates new form JFClientes
-     */
     public JFClientes() {
         initComponents();
+        btnRemover.setEnabled(false);
+        btnAlterar.setEnabled(false);
+        btnConfirmar.setEnabled(false);
+        btnCancelar.setEnabled(false);
+        txtID.setEnabled(false);
+        txtNome.setEnabled(false);
+        txtTelRes.setEnabled(false);
+        txtTelCom.setEnabled(false);
+        txtTelCel.setEnabled(false);
+        txtEmail.setEnabled(false);
+        lblMensagem.setText("");
+        txtID.setText("");
+        txtTelRes.setText("(00)0000-0000"); 
+        txtTelCom.setText("(00)0000-0000"); 
+        txtTelCel.setText("(00)00000-0000"); 
+        UpdateTabela();
     }
 
+    private void Limpar() {
+        tbClientes.setBackground(Color.WHITE);
+        tbClientes.setEnabled(true);
+        btnInserir.setEnabled(true);
+        btnRemover.setEnabled(false);
+        btnAlterar.setEnabled(false);
+        btnConfirmar.setEnabled(false);
+        btnCancelar.setEnabled(false);
+        txtID.setEnabled(false);
+        txtNome.setEnabled(false);
+        txtTelRes.setEnabled(false);
+        txtTelCom.setEnabled(false);
+        txtTelCel.setEnabled(false);
+        txtEmail.setEnabled(false);
+        txtID.setText("");
+        txtNome.setText("");
+        txtTelRes.setText("(00)0000-0000"); 
+        txtTelCom.setText("(00)0000-0000"); 
+        txtTelCel.setText("(00)00000-0000");
+        txtEmail.setText("");
+        UpdateTabela();
+    }
+    
+    private void UpdateTabela() {
+        Connection con = Conexao.abrirConexao();
+        ClienteDAO cd = new ClienteDAO(con);
+        
+        List<ClienteBean> listaCliente = new ArrayList<ClienteBean>();
+        listaCliente = cd.listarTodos();
+        
+        DefaultTableModel tbm = (DefaultTableModel) tbClientes.getModel();
+        
+        for (int i = tbm.getRowCount ()-1; i >= 0; i--) {
+            tbm.removeRow(i);   
+        } 
+        
+        int i = 0;
+        for (ClienteBean cb : listaCliente) {
+            tbm.addRow(new String[1]);
+            
+            tbClientes.setValueAt(cb.getId(), i, 0);
+            tbClientes.setValueAt(cb.getNome(), i, 1);
+            tbClientes.setValueAt(cb.getEmail(), i, 2);
+            
+            i++;
+        }
+        Conexao.fecharConexao(con);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -28,6 +91,7 @@ public class JFClientes extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        lblMensagem = new javax.swing.JLabel();
         lblID = new javax.swing.JLabel();
         txtID = new javax.swing.JTextField();
         lblNome = new javax.swing.JLabel();
@@ -45,7 +109,7 @@ public class JFClientes extends javax.swing.JFrame {
         btnAlterar = new javax.swing.JButton();
         btnConfirmar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
-        btnSair = new javax.swing.JButton();
+        btnVoltar = new javax.swing.JButton();
         lblClientesCadastrados = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -74,6 +138,8 @@ public class JFClientes extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setText("Cadastro de Clientes");
 
+        lblMensagem.setText("Mensagem");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -81,13 +147,17 @@ public class JFClientes extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
+                .addGap(92, 92, 92)
+                .addComponent(lblMensagem)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(lblMensagem))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -112,24 +182,44 @@ public class JFClientes extends javax.swing.JFrame {
         btnInserir.setBackground(new java.awt.Color(204, 204, 255));
         btnInserir.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         btnInserir.setText("Inserir");
+        btnInserir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInserirActionPerformed(evt);
+            }
+        });
 
         btnRemover.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         btnRemover.setText("Remover");
+        btnRemover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoverActionPerformed(evt);
+            }
+        });
 
         btnAlterar.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         btnAlterar.setText("Alterar");
 
         btnConfirmar.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         btnConfirmar.setText("Confirmar");
+        btnConfirmar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConfirmarActionPerformed(evt);
+            }
+        });
 
         btnCancelar.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         btnCancelar.setText("Cancelar");
-
-        btnSair.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
-        btnSair.setText("Sair");
-        btnSair.addActionListener(new java.awt.event.ActionListener() {
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSairActionPerformed(evt);
+                btnCancelarActionPerformed(evt);
+            }
+        });
+
+        btnVoltar.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
+        btnVoltar.setText("Voltar");
+        btnVoltar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVoltarActionPerformed(evt);
             }
         });
 
@@ -140,13 +230,9 @@ public class JFClientes extends javax.swing.JFrame {
         jSeparator1.setBackground(new java.awt.Color(51, 102, 255));
         jSeparator1.setForeground(new java.awt.Color(51, 51, 255));
 
-        tbClientes.setBackground(new java.awt.Color(204, 204, 204));
         tbClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "ID", "Nome", "E-mail"
@@ -165,6 +251,11 @@ public class JFClientes extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        tbClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbClientesMouseClicked(evt);
             }
         });
         jScrollPane2.setViewportView(tbClientes);
@@ -220,7 +311,7 @@ public class JFClientes extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnSair, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnVoltar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblEmail)
@@ -271,13 +362,13 @@ public class JFClientes extends javax.swing.JFrame {
                                         .addComponent(btnInserir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
-                                .addComponent(btnSair, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btnVoltar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblClientesCadastrados))
                     .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -295,9 +386,90 @@ public class JFClientes extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSairActionPerformed
-        System.exit(0);
-    }//GEN-LAST:event_btnSairActionPerformed
+    private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
+        JFMenu abrir = new JFMenu();
+        abrir.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnVoltarActionPerformed
+
+    private void btnInserirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirActionPerformed
+        btnConfirmar.setEnabled(true);
+        btnCancelar.setEnabled(true);
+        btnInserir.setEnabled(false); 
+        txtNome.setEnabled(true);
+        txtTelRes.setEnabled(true);
+        txtTelCom.setEnabled(true);
+        txtTelCel.setEnabled(true);
+        txtEmail.setEnabled(true);
+        tbClientes.setBackground(Color.DARK_GRAY);
+        tbClientes.setEnabled(false);
+        lblMensagem.setText("");
+    }//GEN-LAST:event_btnInserirActionPerformed
+
+    private void tbClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbClientesMouseClicked
+        Integer linha = tbClientes.getSelectedRow();
+        String id = (String) tbClientes.getValueAt(linha, 0);
+        String nome = (String) tbClientes.getValueAt(linha, 1);
+        String email = (String) tbClientes.getValueAt(linha, 2);
+        
+        txtID.setText(id);
+        txtNome.setText(nome);
+        txtEmail.setText(email);
+        btnInserir.setEnabled(false);
+        btnRemover.setEnabled(true);
+        btnAlterar.setEnabled(true);
+        btnConfirmar.setEnabled(false);
+        btnCancelar.setEnabled(true);
+        txtNome.setEnabled(true);
+        txtTelRes.setEnabled(true);
+        txtTelCom.setEnabled(true);
+        txtTelCel.setEnabled(true);
+        txtEmail.setEnabled(true);
+    }//GEN-LAST:event_tbClientesMouseClicked
+
+    private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
+        Connection con = Conexao.abrirConexao();
+        ClienteBean cb = new ClienteBean();
+        ClienteDAO cd = new ClienteDAO(con);
+       
+        cb.setNome(txtNome.getText());
+        cb.setTelres(txtTelRes.getText());
+        cb.setTelcom(txtTelCom.getText());
+        cb.setTelcel(txtTelCel.getText());
+        cb.setEmail(txtEmail.getText());
+        
+        lblMensagem.setText(cd.inserirCliente(cb));
+        
+        Conexao.fecharConexao(con);
+        Limpar();
+    }//GEN-LAST:event_btnConfirmarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        Limpar();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoverActionPerformed
+        Connection con = Conexao.abrirConexao();
+        ClienteBean cb = new ClienteBean();
+        ClienteDAO cd = new ClienteDAO(con);
+        
+        cb.setNome(txtNome.getText());
+        Object [] opcoes = {"Sim", "Não"};
+        int i = JOptionPane.showOptionDialog(
+                    null,
+                    "Deseja excluir o Cliente: "+txtNome.getText()+"?",
+                    "Pergunta",
+                    JOptionPane.YES_NO_OPTION,
+                    3,
+                    null,
+                    opcoes,
+                    opcoes[0]);
+        if (i == JOptionPane.YES_NO_OPTION) {
+            lblMensagem.setText(cd.excluirCliente(cb));
+        }
+        Conexao.fecharConexao(con);
+        Limpar();
+    }//GEN-LAST:event_btnRemoverActionPerformed
 
     /**
      * @param args the command line arguments
@@ -340,7 +512,7 @@ public class JFClientes extends javax.swing.JFrame {
     private javax.swing.JButton btnConfirmar;
     private javax.swing.JButton btnInserir;
     private javax.swing.JButton btnRemover;
-    private javax.swing.JButton btnSair;
+    private javax.swing.JButton btnVoltar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -351,6 +523,7 @@ public class JFClientes extends javax.swing.JFrame {
     private javax.swing.JLabel lblClientesCadastrados;
     private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblID;
+    private javax.swing.JLabel lblMensagem;
     private javax.swing.JLabel lblNome;
     private javax.swing.JLabel lblTelCel;
     private javax.swing.JLabel lblTelCom;

@@ -41,6 +41,4 @@ public class EmpresaBean {
     public void setRazsocial(String razsocial) {
         this.razsocial = razsocial;
     }
-    
-    
 }
