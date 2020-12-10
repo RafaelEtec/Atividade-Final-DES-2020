@@ -90,22 +90,84 @@ public class ClienteDAO {
     }
     
     public String alterarCliente(ClienteBean cliente) {
-        String sql = "update tbcadclientes set nome = ?, telres = ?, telcom = ?, telcel = ?, email = ?";
+        String sql = "update tbcadclientes set nome = ?, telres = ?, telcom = ?, telcel = ?, email = ? where id = ?";
     
         try {
             PreparedStatement ps = getCon().prepareStatement(sql);
+            
             
             ps.setString(1, cliente.getNome());
             ps.setString(2, cliente.getTelres());
             ps.setString(3, cliente.getTelcom());
             ps.setString(4, cliente.getTelcel());
             ps.setString(5, cliente.getEmail());
+            ps.setString(6, cliente.getId());
             
             if (ps.executeUpdate() > 0) {
                 return "Informações do Cliente Alteradas \n";
             } else {
                 return "Erro na Alteração \n";
             }
+        } catch (SQLException ex) {
+            return ex.getMessage();
+        }
+    }
+    
+    public String TeleRes(String id) {
+        String sql = "select telres from tbcadclientes where id = ?";
+    
+        String teleRes = "";
+        ResultSet rs = null;
+        try {
+            PreparedStatement ps = getCon().prepareStatement(sql);
+            ps.setString(1, id);
+            
+            rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                teleRes = rs.getString("telres");
+            }
+            return teleRes;
+        } catch (SQLException ex) {
+            return ex.getMessage();
+        }
+    }
+    
+    public String TeleCom(String id) {
+        String sql = "select telcom from tbcadclientes where id = ?";
+    
+        String teleCom = "";
+        ResultSet rs = null;
+        try {
+            PreparedStatement ps = getCon().prepareStatement(sql);
+            ps.setString(1, id);
+            
+            rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                teleCom = rs.getString("telcom");
+            }
+            return teleCom;
+        } catch (SQLException ex) {
+            return ex.getMessage();
+        }
+    }
+    
+    public String TeleCel(String id) {
+        String sql = "select telcel from tbcadclientes where id = ?";
+    
+        String teleCel = "";
+        ResultSet rs = null;
+        try {
+            PreparedStatement ps = getCon().prepareStatement(sql);
+            ps.setString(1, id);
+            
+            rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                teleCel = rs.getString("telcel");
+            }
+            return teleCel;
         } catch (SQLException ex) {
             return ex.getMessage();
         }

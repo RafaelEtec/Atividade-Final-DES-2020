@@ -77,6 +77,19 @@ public class JFClientes extends javax.swing.JFrame {
         }
         Conexao.fecharConexao(con);
     }
+    
+    private void MostraInfo() {
+        Connection con = Conexao.abrirConexao();
+        ClienteDAO cd = new ClienteDAO(con);
+        
+        String telres = cd.TeleRes(txtID.getText());
+        txtTelRes.setText(telres);
+        String telcom = cd.TeleCom(txtID.getText());
+        txtTelCom.setText(telcom);
+        String telcel = cd.TeleCel(txtID.getText());
+        txtTelCel.setText(telcel);   
+        Conexao.fecharConexao(con);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -198,6 +211,11 @@ public class JFClientes extends javax.swing.JFrame {
 
         btnAlterar.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         btnAlterar.setText("Alterar");
+        btnAlterar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAlterarActionPerformed(evt);
+            }
+        });
 
         btnConfirmar.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         btnConfirmar.setText("Confirmar");
@@ -256,6 +274,14 @@ public class JFClientes extends javax.swing.JFrame {
         tbClientes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tbClientesMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tbClientesMousePressed(evt);
+            }
+        });
+        tbClientes.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tbClientesKeyPressed(evt);
             }
         });
         jScrollPane2.setViewportView(tbClientes);
@@ -407,6 +433,8 @@ public class JFClientes extends javax.swing.JFrame {
     }//GEN-LAST:event_btnInserirActionPerformed
 
     private void tbClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbClientesMouseClicked
+        MostraInfo();
+        
         Integer linha = tbClientes.getSelectedRow();
         String id = (String) tbClientes.getValueAt(linha, 0);
         String nome = (String) tbClientes.getValueAt(linha, 1);
@@ -415,6 +443,8 @@ public class JFClientes extends javax.swing.JFrame {
         txtID.setText(id);
         txtNome.setText(nome);
         txtEmail.setText(email);
+        
+        lblMensagem.setText("");
         btnInserir.setEnabled(false);
         btnRemover.setEnabled(true);
         btnAlterar.setEnabled(true);
@@ -425,6 +455,7 @@ public class JFClientes extends javax.swing.JFrame {
         txtTelCom.setEnabled(true);
         txtTelCel.setEnabled(true);
         txtEmail.setEnabled(true);
+        
     }//GEN-LAST:event_tbClientesMouseClicked
 
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
@@ -453,23 +484,48 @@ public class JFClientes extends javax.swing.JFrame {
         ClienteBean cb = new ClienteBean();
         ClienteDAO cd = new ClienteDAO(con);
         
-        cb.setNome(txtNome.getText());
+        cb.setId(txtID.getText());
         Object [] opcoes = {"Sim", "Não"};
         int i = JOptionPane.showOptionDialog(
                     null,
                     "Deseja excluir o Cliente: "+txtNome.getText()+"?",
                     "Pergunta",
                     JOptionPane.YES_NO_OPTION,
-                    3,
+                    JOptionPane.QUESTION_MESSAGE,
                     null,
                     opcoes,
                     opcoes[0]);
         if (i == JOptionPane.YES_NO_OPTION) {
             lblMensagem.setText(cd.excluirCliente(cb));
         }
-        Conexao.fecharConexao(con);
         Limpar();
+        Conexao.fecharConexao(con);
     }//GEN-LAST:event_btnRemoverActionPerformed
+
+    private void tbClientesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbClientesKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbClientesKeyPressed
+
+    private void tbClientesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbClientesMousePressed
+
+    }//GEN-LAST:event_tbClientesMousePressed
+
+    private void btnAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterarActionPerformed
+        Connection con = Conexao.abrirConexao();
+        ClienteBean cb = new ClienteBean();
+        ClienteDAO cd = new ClienteDAO(con);
+        
+        cb.setId(txtID.getText());
+        cb.setNome(txtNome.getText());
+        cb.setTelres(txtTelRes.getText());
+        cb.setTelcom(txtTelCom.getText());
+        cb.setTelcel(txtTelCel.getText());
+        cb.setEmail(txtEmail.getText());
+        lblMensagem.setText(cd.alterarCliente(cb));
+        
+        Limpar();
+        Conexao.fecharConexao(con);
+    }//GEN-LAST:event_btnAlterarActionPerformed
 
     /**
      * @param args the command line arguments
